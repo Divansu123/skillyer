@@ -1,0 +1,191 @@
+// Prisma Schema - SkillYer with MySQL
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Category {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  icon      String
+  count     Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  courses Course[]
+
+  @@map("categories")
+}
+
+model Provider {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  logo      String
+  color     String
+  bg        String
+  courses   Int      @default(0)
+  rating    Float    @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  coursesList Course[]
+
+  @@map("providers")
+}
+
+model Course {
+  id         Int      @id @default(autoincrement())
+  title      String
+  provId     String
+  catId      String
+  level      String
+  duration   String
+  price      Int      @default(0)
+  origPrice  Int      @default(0)
+  rating     Float    @default(0)
+  students   String
+  hasCert    Boolean  @default(false)
+  tags       String   @db.Text // JSON string
+  emoji      String
+  featured   Boolean  @default(false)
+  isImportant Boolean @default(false) // show in homepage top courses
+  isActive   Boolean  @default(true)  // inactive = hidden from portal
+  expLevel   String   @default("any") // fresher, mid, senior, any
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  provider   Provider @relation(fields: [provId], references: [id])
+  category   Category @relation(fields: [catId], references: [id])
+  enrollments Enrollment[]
+
+  @@map("courses")
+}
+
+model Job {
+  id        Int      @id @default(autoincrement())
+  title     String
+  company   String
+  logo      String
+  logoBg    String
+  logoCo    String
+  cat       String
+  expLevel  String
+  jobType   String
+  location  String
+  salary    String
+  tags      String   @db.Text // JSON string
+  badge     String   @default("")
+  badgeType String   @default("")
+  postedAt  String
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  applications Application[]
+
+  @@map("jobs")
+}
+
+model Enrollment {
+  id            Int      @id @default(autoincrement())
+  name          String
+  email         String
+  phone         String?
+  courseId      Int
+  qualification String?  // e.g. B.Tech, MBA, 12th Pass
+  source        String   @default("manual") // manual = admin added, public = portal enroll
+  status        String   @default("Active") // Active, Completed, In Progress
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  course        Course   @relation(fields: [courseId], references: [id])
+
+  @@map("enrollments")
+}
+
+model Application {
+  id               Int      @id @default(autoincrement())
+  name             String
+  email            String
+  phone            String?
+  jobId            Int
+  cvUrl            String?
+  cvName           String?
+  message          String?  @db.Text
+  qualification    String?  // Highest qualification
+  experience       String?  // Years of experience e.g. "3 years"
+  currentCtc       String?  // Current CTC e.g. "8 LPA"
+  expectedCtc      String?  // Expected CTC e.g. "12 LPA"
+  noticePeriod     String?  // Notice period e.g. "30 days", "Immediate"
+  currentOrg      String?  // Current organisation name
+  status           String   @default("Pending") // Pending, Reviewed, Shortlisted, Rejected
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  job              Job      @relation(fields: [jobId], references: [id])
+
+  @@map("applications")
+}
+
+model CounselRequest {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String
+  phone     String?
+  role      String?
+  field     String
+  expLevel  String
+  message   String?  @db.Text
+  status    String   @default("Pending") // Pending, Scheduled, Completed
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("counsel_requests")
+}
+
+model Admin {
+  id        Int      @id @default(autoincrement())
+  username  String   @unique
+  password  String
+  role      String   @default("admin")
+  createdAt DateTime @default(now())
+
+  @@map("admins")
+}
+
+model Testimonial {
+  id        Int      @id @default(autoincrement())
+  name      String
+  role      String
+  company   String
+  avatar    String
+  avatarBg  String
+  avatarCo  String
+  course    String
+  text      String   @db.Text
+  rating    Int      @default(5)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  @@map("testimonials")
+}
+
+model RoiData {
+  id           Int    @id @default(autoincrement())
+  key          String @unique
+  name         String
+  lift         Float
+  demand       Int
+  demandLabel  String
+  paybackMonths Int
+  courseCost   Int
+
+  @@map("roi_data")
+}
