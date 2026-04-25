@@ -799,7 +799,7 @@ const ApplicationsSection = () => {
   const [total, setTotal] = useState(0);
   const [search, setSearch] = useState("");
   const LIMIT = 15;
-  const API_BASE = process.env.REACT_APP_API_URL || "https://skillyer-api.onrender.com/api";
+  const API_BASE = process.env.REACT_APP_SERVER_URL || "https://skillyer-api.onrender.com";
 
   const load = useCallback((p = 1) => {
     fetchApplications({ limit: LIMIT, page: p })
