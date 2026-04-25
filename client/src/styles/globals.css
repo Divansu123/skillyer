@@ -2446,7 +2446,7 @@ input[type=range]::-webkit-slider-thumb {
 /* ADMIN */
 .admin-layout {
   display: grid;
-  grid-template-columns: 220px 1fr;
+  grid-template-columns: 220px minmax(0, 1fr);  /* minmax(0,1fr) prevents overflow */
   min-height: 100vh;
   padding-top: 64px;
 }
@@ -2514,6 +2514,9 @@ input[type=range]::-webkit-slider-thumb {
 .admin-content {
   padding: 28px;
   background: var(--bg);
+  min-width: 0;          /* prevents grid child from overflowing */
+  overflow-x: hidden;   /* clips any overflow at the content level */
+  width: 100%;
 }
 
 .admin-section {
@@ -2547,6 +2550,7 @@ input[type=range]::-webkit-slider-thumb {
   padding: 20px;
   margin-bottom: 16px;
   box-shadow: 0 2px 8px rgba(98, 70, 234, 0.04);
+  max-width: 100%;
 }
 
 .admin-stat-grid {
@@ -2616,6 +2620,65 @@ input[type=range]::-webkit-slider-thumb {
 .admin-table tr:hover td {
   background: var(--surface2);
 }
+
+/* ── Compact Applications Table ─────────────────────────────────────────── */
+/* Fits all 15 columns without scrolling by reducing size & padding */
+.applications-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.applications-table th {
+  text-align: left;
+  padding: 8px 6px;
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  border-bottom: 1.5px solid var(--border);
+  background: var(--surface2);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.applications-table td {
+  padding: 8px 6px;
+  font-size: 11px;
+  color: var(--text);
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.applications-table tr:last-child td {
+  border-bottom: none;
+}
+
+.applications-table tr:hover td {
+  background: var(--surface2);
+}
+
+/* Column widths — total must fit within content area (~1200px) */
+.applications-table .col-applicant  { width: 120px; }
+.applications-table .col-email      { width: 130px; }
+.applications-table .col-phone      { width: 90px; }
+.applications-table .col-job        { width: 80px; }
+.applications-table .col-company    { width: 90px; }
+.applications-table .col-qual       { width: 70px; }
+.applications-table .col-exp        { width: 70px; }
+.applications-table .col-org        { width: 80px; }
+.applications-table .col-ctc        { width: 60px; }
+.applications-table .col-ectc       { width: 60px; }
+.applications-table .col-notice     { width: 55px; }
+.applications-table .col-cv         { width: 70px; }
+.applications-table .col-date       { width: 70px; }
+.applications-table .col-status     { width: 80px; }
+.applications-table .col-action     { width: 36px; text-align: center; }
 
 .admin-badge {
   display: inline-block;
@@ -3163,4 +3226,3 @@ footer {
   object-fit: fill;
   object-position: left center;
 }
-
