@@ -20,7 +20,7 @@ const app = express();
 // Middleware
 app.use(
   cors({
-    origin: process.env.CLIENT_URL || "https://skillyer.com",
+    origin: process.env.CLIENT_URL || "http://skillyer.com",
     credentials: true,
   }),
 );
