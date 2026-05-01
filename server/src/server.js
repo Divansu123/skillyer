@@ -24,6 +24,14 @@ app.use(
     credentials: true,
   }),
 );
+
+// app.use(
+//   cors({
+//     origin: process.env.CLIENT_URL || "http://localhost:3000",
+//     credentials: true,
+//   }),
+// );
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -59,13 +67,11 @@ app.use((req, res) => {
 // Error handler
 app.use((err, req, res, next) => {
   console.error(err.stack);
-  res
-    .status(500)
-    .json({
-      success: false,
-      message: "Internal server error",
-      error: process.env.NODE_ENV === "development" ? err.message : undefined,
-    });
+  res.status(500).json({
+    success: false,
+    message: "Internal server error",
+    error: process.env.NODE_ENV === "development" ? err.message : undefined,
+  });
 });
 
 const PORT = process.env.PORT;

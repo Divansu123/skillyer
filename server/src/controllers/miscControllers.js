@@ -12,13 +12,19 @@ const getEnrollments = async (req, res) => {
       prisma.enrollment.findMany({
         where,
         include: { course: { include: { provider: true } } },
-        orderBy: { createdAt: 'desc' },
+        orderBy: { createdAt: "desc" },
         take: parseInt(limit),
         skip,
       }),
       prisma.enrollment.count(),
     ]);
-    res.json({ success: true, data: enrollments, total, page: parseInt(page), pages: Math.ceil(total / parseInt(limit)) });
+    res.json({
+      success: true,
+      data: enrollments,
+      total,
+      page: parseInt(page),
+      pages: Math.ceil(total / parseInt(limit)),
+    });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }
@@ -26,24 +32,38 @@ const getEnrollments = async (req, res) => {
 
 const createEnrollment = async (req, res) => {
   try {
-    const { name, email, phone, courseId, qualification } = req.body;
+    const {
+      name,
+      email,
+      phone,
+      courseId,
+      qualification,
+      location,
+      preference,
+    } = req.body;
     if (!name || !email || !courseId)
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "Name, email, and courseId required",
-        });
-    const enrollment = await prisma.enrollment.create({
-      data: { name, email, phone, courseId: parseInt(courseId), qualification, source: req.body.source || 'public', status: req.body.source === 'manual' ? 'Active' : 'Pending' },
-    });
-    res
-      .status(201)
-      .json({
-        success: true,
-        data: enrollment,
-        message: "Enrollment submitted successfully!",
+      return res.status(400).json({
+        success: false,
+        message: "Name, email, and courseId required",
       });
+    const enrollment = await prisma.enrollment.create({
+      data: {
+        name,
+        email,
+        phone,
+        courseId: parseInt(courseId),
+        qualification,
+        source: req.body.source || "public",
+        status: req.body.source === "manual" ? "Active" : "Pending",
+        location,
+        preference,
+      },
+    });
+    res.status(201).json({
+      success: true,
+      data: enrollment,
+      message: "Enrollment submitted successfully!",
+    });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }
@@ -63,7 +83,16 @@ const updateEnrollmentStatus = async (req, res) => {
 
 const updateEnrollment = async (req, res) => {
   try {
-    const { name, email, phone, courseId, status, qualification } = req.body;
+    const {
+      name,
+      email,
+      phone,
+      courseId,
+      status,
+      qualification,
+      location,
+      preference,
+    } = req.body;
     const data = {};
     if (name !== undefined) data.name = name;
     if (email !== undefined) data.email = email;
@@ -71,6 +100,8 @@ const updateEnrollment = async (req, res) => {
     if (courseId !== undefined) data.courseId = parseInt(courseId);
     if (status !== undefined) data.status = status;
     if (qualification !== undefined) data.qualification = qualification;
+    if (location !== undefined) data.location = location;
+    if (preference !== undefined) data.preference = preference;
     if (req.body.source !== undefined) data.source = req.body.source;
     const enrollment = await prisma.enrollment.update({
       where: { id: parseInt(req.params.id) },
@@ -86,7 +117,7 @@ const updateEnrollment = async (req, res) => {
 const deleteEnrollment = async (req, res) => {
   try {
     await prisma.enrollment.delete({ where: { id: parseInt(req.params.id) } });
-    res.json({ success: true, message: 'Enrollment deleted' });
+    res.json({ success: true, message: "Enrollment deleted" });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }
@@ -100,13 +131,19 @@ const getApplications = async (req, res) => {
     const [applications, total] = await Promise.all([
       prisma.application.findMany({
         include: { job: true },
-        orderBy: { createdAt: 'desc' },
+        orderBy: { createdAt: "desc" },
         take: parseInt(limit),
         skip,
       }),
       prisma.application.count(),
     ]);
-    res.json({ success: true, data: applications, total, page: parseInt(page), pages: Math.ceil(total / parseInt(limit)) });
+    res.json({
+      success: true,
+      data: applications,
+      total,
+      page: parseInt(page),
+      pages: Math.ceil(total / parseInt(limit)),
+    });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }
@@ -114,18 +151,52 @@ const getApplications = async (req, res) => {
 
 const createApplication = async (req, res) => {
   try {
-    const { name, email, phone, jobId, message, qualification, experience, currentCtc, expectedCtc, noticePeriod, currentOrg } = req.body;
+    const {
+      name,
+      email,
+      phone,
+      jobId,
+      message,
+      qualification,
+      experience,
+      currentCtc,
+      expectedCtc,
+      noticePeriod,
+      currentOrg,
+    } = req.body;
     if (!name || !email || !jobId)
-      return res.status(400).json({ success: false, message: "Name, email, jobId required" });
+      return res
+        .status(400)
+        .json({ success: false, message: "Name, email, jobId required" });
 
     // CV file from multer
     const cvUrl = req.file ? `/uploads/resumes/${req.file.filename}` : null;
     const cvName = req.file ? req.file.originalname : null;
 
     const application = await prisma.application.create({
-      data: { name, email, phone, jobId: parseInt(jobId), message, cvUrl, cvName, qualification, experience, currentCtc, expectedCtc, noticePeriod, currentOrg },
+      data: {
+        name,
+        email,
+        phone,
+        jobId: parseInt(jobId),
+        message,
+        cvUrl,
+        cvName,
+        qualification,
+        experience,
+        currentCtc,
+        expectedCtc,
+        noticePeriod,
+        currentOrg,
+      },
     });
-    res.status(201).json({ success: true, data: application, message: "Application submitted!" });
+    res
+      .status(201)
+      .json({
+        success: true,
+        data: application,
+        message: "Application submitted!",
+      });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }
@@ -145,15 +216,17 @@ const updateApplicationStatus = async (req, res) => {
 
 const deleteApplication = async (req, res) => {
   try {
-    const app = await prisma.application.findUnique({ where: { id: parseInt(req.params.id) } });
+    const app = await prisma.application.findUnique({
+      where: { id: parseInt(req.params.id) },
+    });
     if (app?.cvUrl) {
-      const path = require('path');
-      const fs = require('fs');
-      const filePath = path.join(__dirname, '../../..', app.cvUrl);
+      const path = require("path");
+      const fs = require("fs");
+      const filePath = path.join(__dirname, "../../..", app.cvUrl);
       if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
     }
     await prisma.application.delete({ where: { id: parseInt(req.params.id) } });
-    res.json({ success: true, message: 'Application deleted' });
+    res.json({ success: true, message: "Application deleted" });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }
@@ -165,13 +238,19 @@ const getCounselRequests = async (req, res) => {
     const skip = (parseInt(page) - 1) * parseInt(limit);
     const [requests, total] = await Promise.all([
       prisma.counselRequest.findMany({
-        orderBy: { createdAt: 'desc' },
+        orderBy: { createdAt: "desc" },
         take: parseInt(limit),
         skip,
       }),
       prisma.counselRequest.count(),
     ]);
-    res.json({ success: true, data: requests, total, page: parseInt(page), pages: Math.ceil(total / parseInt(limit)) });
+    res.json({
+      success: true,
+      data: requests,
+      total,
+      page: parseInt(page),
+      pages: Math.ceil(total / parseInt(limit)),
+    });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }
@@ -195,14 +274,12 @@ const createCounselRequest = async (req, res) => {
         message,
       },
     });
-    res
-      .status(201)
-      .json({
-        success: true,
-        data: request,
-        message:
-          "Counselling session booked! We will contact you within 24 hours.",
-      });
+    res.status(201).json({
+      success: true,
+      data: request,
+      message:
+        "Counselling session booked! We will contact you within 24 hours.",
+    });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }
@@ -254,7 +331,7 @@ const getCategories = async (req, res) => {
       orderBy: { name: "asc" },
       include: { _count: { select: { courses: true } } },
     });
-    const formatted = categories.map(c => ({
+    const formatted = categories.map((c) => ({
       ...c,
       count: c._count.courses,
       _count: undefined,
@@ -292,7 +369,7 @@ const getProviders = async (req, res) => {
       include: { _count: { select: { coursesList: true } } },
     });
     // Attach real course count
-    const formatted = providers.map(p => ({
+    const formatted = providers.map((p) => ({
       ...p,
       courses: p._count.coursesList,
       _count: undefined,
@@ -308,7 +385,15 @@ const createProvider = async (req, res) => {
     // Strip fields not in Provider schema (url, desc are not columns)
     const { id, name, logo, color, bg, courses, rating } = req.body;
     const provider = await prisma.provider.create({
-      data: { id, name, logo: logo || '', color: color || '#6246ea', bg: bg || '#f0f2f8', courses: Number(courses) || 0, rating: Number(rating) || 0 },
+      data: {
+        id,
+        name,
+        logo: logo || "",
+        color: color || "#6246ea",
+        bg: bg || "#f0f2f8",
+        courses: Number(courses) || 0,
+        rating: Number(rating) || 0,
+      },
     });
     res.status(201).json({ success: true, data: provider });
   } catch (err) {
@@ -330,7 +415,15 @@ const updateProvider = async (req, res) => {
     const { id, name, logo, color, bg, courses, rating, isActive } = req.body;
     const provider = await prisma.provider.update({
       where: { id: req.params.id },
-      data: { name, logo, color, bg, courses: Number(courses), rating: Number(rating), isActive: isActive !== undefined ? Boolean(isActive) : undefined },
+      data: {
+        name,
+        logo,
+        color,
+        bg,
+        courses: Number(courses),
+        rating: Number(rating),
+        isActive: isActive !== undefined ? Boolean(isActive) : undefined,
+      },
     });
     res.json({ success: true, data: provider });
   } catch (err) {
@@ -461,50 +554,51 @@ const getAdminStats = async (req, res) => {
 const getRecentActivity = async (req, res) => {
   try {
     const limit = 10;
-    const [recentEnrollments, recentApplications, recentCounsels] = await Promise.all([
-      prisma.enrollment.findMany({
-        take: limit,
-        orderBy: { createdAt: 'desc' },
-        include: { course: true },
-      }),
-      prisma.application.findMany({
-        take: limit,
-        orderBy: { createdAt: 'desc' },
-        include: { job: true },
-      }),
-      prisma.counselRequest.findMany({
-        take: limit,
-        orderBy: { createdAt: 'desc' },
-      }),
-    ]);
+    const [recentEnrollments, recentApplications, recentCounsels] =
+      await Promise.all([
+        prisma.enrollment.findMany({
+          take: limit,
+          orderBy: { createdAt: "desc" },
+          include: { course: true },
+        }),
+        prisma.application.findMany({
+          take: limit,
+          orderBy: { createdAt: "desc" },
+          include: { job: true },
+        }),
+        prisma.counselRequest.findMany({
+          take: limit,
+          orderBy: { createdAt: "desc" },
+        }),
+      ]);
 
     const activities = [
-      ...recentEnrollments.map(e => ({
+      ...recentEnrollments.map((e) => ({
         user: e.name,
-        action: 'Enrolled',
-        item: e.course?.title || 'Unknown Course',
+        action: "Enrolled",
+        item: e.course?.title || "Unknown Course",
         time: e.createdAt,
-        type: 'enrollment',
+        type: "enrollment",
       })),
-      ...recentApplications.map(a => ({
+      ...recentApplications.map((a) => ({
         user: a.name,
-        action: 'Applied for Job',
-        item: a.job?.title || 'Unknown Job',
+        action: "Applied for Job",
+        item: a.job?.title || "Unknown Job",
         time: a.createdAt,
-        type: 'application',
+        type: "application",
       })),
-      ...recentCounsels.map(c => ({
+      ...recentCounsels.map((c) => ({
         user: c.name,
-        action: 'Booked Counselling',
+        action: "Booked Counselling",
         item: c.field,
         time: c.createdAt,
-        type: 'counsel',
+        type: "counsel",
       })),
     ];
 
     // Sort by time desc, take top 10
     activities.sort((a, b) => new Date(b.time) - new Date(a.time));
-    const top = activities.slice(0, 10).map(a => ({
+    const top = activities.slice(0, 10).map((a) => ({
       ...a,
       timeAgo: formatTimeAgo(a.time),
     }));

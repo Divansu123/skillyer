@@ -41,28 +41,28 @@ model Provider {
 }
 
 model Course {
-  id         Int      @id @default(autoincrement())
-  title      String
-  provId     String
-  catId      String
-  level      String
-  duration   String
-  price      Int      @default(0)
-  origPrice  Int      @default(0)
-  rating     Float    @default(0)
-  students   String
-  hasCert    Boolean  @default(false)
-  tags       String   @db.Text // JSON string
-  emoji      String
-  featured   Boolean  @default(false)
-  isImportant Boolean @default(false) // show in homepage top courses
-  isActive   Boolean  @default(true)  // inactive = hidden from portal
-  expLevel   String   @default("any") // fresher, mid, senior, any
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  id          Int      @id @default(autoincrement())
+  title       String
+  provId      String
+  catId       String
+  level       String
+  duration    String
+  price       Int      @default(0)
+  origPrice   Int      @default(0)
+  rating      Float    @default(0)
+  students    String
+  hasCert     Boolean  @default(false)
+  tags        String   @db.Text // JSON string
+  emoji       String
+  featured    Boolean  @default(false)
+  isImportant Boolean  @default(false) // show in homepage top courses
+  isActive    Boolean  @default(true) // inactive = hidden from portal
+  expLevel    String   @default("any") // fresher, mid, senior, any
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
-  provider   Provider @relation(fields: [provId], references: [id])
-  category   Category @relation(fields: [catId], references: [id])
+  provider    Provider     @relation(fields: [provId], references: [id])
+  category    Category     @relation(fields: [catId], references: [id])
   enrollments Enrollment[]
 
   @@map("courses")
@@ -99,37 +99,38 @@ model Enrollment {
   email         String
   phone         String?
   courseId      Int
-  qualification String?  // e.g. B.Tech, MBA, 12th Pass
-  source        String   @default("manual") // manual = admin added, public = portal enroll
-  status        String   @default("Active") // Active, Completed, In Progress
+  qualification String?
+  location      String?
+  preference    String?
+  source        String   @default("manual")
+  status        String   @default("Active")
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
-
   course        Course   @relation(fields: [courseId], references: [id])
 
   @@map("enrollments")
 }
 
 model Application {
-  id               Int      @id @default(autoincrement())
-  name             String
-  email            String
-  phone            String?
-  jobId            Int
-  cvUrl            String?
-  cvName           String?
-  message          String?  @db.Text
-  qualification    String?  // Highest qualification
-  experience       String?  // Years of experience e.g. "3 years"
-  currentCtc       String?  // Current CTC e.g. "8 LPA"
-  expectedCtc      String?  // Expected CTC e.g. "12 LPA"
-  noticePeriod     String?  // Notice period e.g. "30 days", "Immediate"
-  currentOrg      String?  // Current organisation name
-  status           String   @default("Pending") // Pending, Reviewed, Shortlisted, Rejected
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
+  id            Int      @id @default(autoincrement())
+  name          String
+  email         String
+  phone         String?
+  jobId         Int
+  cvUrl         String?
+  cvName        String?
+  message       String?  @db.Text
+  qualification String? // Highest qualification
+  experience    String? // Years of experience e.g. "3 years"
+  currentCtc    String? // Current CTC e.g. "8 LPA"
+  expectedCtc   String? // Expected CTC e.g. "12 LPA"
+  noticePeriod  String? // Notice period e.g. "30 days", "Immediate"
+  currentOrg    String? // Current organisation name
+  status        String   @default("Pending") // Pending, Reviewed, Shortlisted, Rejected
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
-  job              Job      @relation(fields: [jobId], references: [id])
+  job Job @relation(fields: [jobId], references: [id])
 
   @@map("applications")
 }
@@ -178,14 +179,14 @@ model Testimonial {
 }
 
 model RoiData {
-  id           Int    @id @default(autoincrement())
-  key          String @unique
-  name         String
-  lift         Float
-  demand       Int
-  demandLabel  String
+  id            Int    @id @default(autoincrement())
+  key           String @unique
+  name          String
+  lift          Float
+  demand        Int
+  demandLabel   String
   paybackMonths Int
-  courseCost   Int
+  courseCost    Int
 
   @@map("roi_data")
 }
