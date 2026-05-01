@@ -20,7 +20,7 @@ const app = express();
 // Middleware
 app.use(
   cors({
-    origin: process.env.CLIENT_URL || "https://skillyer.onrender.com",
+    origin: process.env.CLIENT_URL || "http://skillyer.com",
     credentials: true,
   }),
 );
@@ -68,7 +68,7 @@ app.use((err, req, res, next) => {
     });
 });
 
-const PORT = process.env.PORT || 5001;
+const PORT = process.env.PORT;
 app.listen(PORT, () => {
   console.log(`🚀 SkillYer API running on port ${PORT}`);
   console.log(`📊 Environment: ${process.env.NODE_ENV}`);
